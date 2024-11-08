@@ -13,25 +13,36 @@ class ManifestService
 {
     public function generate()
     {
-        $basicManifest =  [
-            'name' => config('laravelpwa.manifest.name'),
-            'short_name' => config('laravelpwa.manifest.short_name'),
-            'start_url' => asset(config('laravelpwa.manifest.start_url')),
-            'display' => config('laravelpwa.manifest.display'),
-            'theme_color' => config('laravelpwa.manifest.theme_color'),
+        $basicManifest = [
+            'name'             => config('laravelpwa.manifest.name'),
+            'short_name'       => config('laravelpwa.manifest.short_name'),
+            'start_url'        => asset(config('laravelpwa.manifest.start_url')),
+            'display'          => config('laravelpwa.manifest.display'),
+            'theme_color'      => config('laravelpwa.manifest.theme_color'),
             'background_color' => config('laravelpwa.manifest.background_color'),
-            'orientation' =>  config('laravelpwa.manifest.orientation'),
-            'status_bar' =>  config('laravelpwa.manifest.status_bar'),
-            'splash' =>  config('laravelpwa.manifest.splash')
+            'orientation'      => config('laravelpwa.manifest.orientation'),
+            'status_bar'       => config('laravelpwa.manifest.status_bar'),
+            'splash'           => config('laravelpwa.manifest.splash'),
         ];
 
         foreach (config('laravelpwa.manifest.icons') as $size => $file) {
-            $fileInfo = pathinfo($file['path']);
+            $fileInfo                 = pathinfo($file['path']);
             $basicManifest['icons'][] = [
-                'src' => $file['path'],
-                'type' => 'image/' . $fileInfo['extension'],
-                'sizes' => (isset($file['sizes']))?$file['sizes']:$size,
-                'purpose' => $file['purpose']
+                'src'     => $file['path'],
+                'type'    => 'image/' . $fileInfo['extension'],
+                'sizes'   => $size,
+                'purpose' => $file['purpose'],
+            ];
+        }
+
+        foreach (config('laravelpwa.manifest.screenshots') as $size => $file) {
+            $fileInfo                       = pathinfo($file['src']);
+            $basicManifest['screenshots'][] = [
+                'src'         => $file['src'],
+                'type'        => 'image/' . $fileInfo['extension'],
+                'sizes'       => $file['sizes'],
+                "form_factor" => $file["form_factor"] ?? "wide",
+                "label"       => $file["label"] ?? "Wonder Widgets"
             ];
         }
 
@@ -40,32 +51,29 @@ class ManifestService
 
                 if (array_key_exists("icons", $shortcut)) {
                     $fileInfo = pathinfo($shortcut['icons']['src']);
-                    $icon = [
-                        'src' => $shortcut['icons']['src'],
-                        'type' => 'image/' . $fileInfo['extension'],
-                        'sizes' => (isset($file['sizes']))?$file['sizes']:$size,
-                        'purpose' => $shortcut['icons']['purpose']
+                    $icon     = [
+                        'src'     => $shortcut['icons']['src'],
+                        'type'    => 'image/' . $fileInfo['extension'],
+                        'sizes'   => $shortcut['icons']['sizes'],
+                        'purpose' => $shortcut['icons']['purpose'],
                     ];
-                    if(isset($shortcut['icons']['sizes'])) {
-                        $icon["sizes"] = $shortcut['icons']['sizes'];
-                    }
                 } else {
                     $icon = [];
                 }
 
                 $basicManifest['shortcuts'][] = [
-                    'name' => trans($shortcut['name']),
+                    'name'        => trans($shortcut['name']),
                     'description' => trans($shortcut['description']),
-                    'url' => $shortcut['url'],
-                    'icons' => [
-                        $icon
-                    ]
+                    'url'         => $shortcut['url'],
+                    'icons'       => [
+                        $icon,
+                    ],
                 ];
             }
         }
 
         foreach (config('laravelpwa.manifest.custom') as $tag => $value) {
-             $basicManifest[$tag] = $value;
+            $basicManifest[$tag] = $value;
         }
         return $basicManifest;
     }
