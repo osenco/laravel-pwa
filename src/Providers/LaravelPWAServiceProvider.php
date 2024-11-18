@@ -84,7 +84,7 @@ class LaravelPWAServiceProvider extends ServiceProvider
     protected function registerIcons()
     {
         $this->publishes([
-            __DIR__ . '/../assets/images/icons' => public_path('images/icons'),
+            __DIR__ . '/../../assets/images/icons' => public_path('images/icons'),
         ], 'pwa-icons');
     }
 
@@ -96,7 +96,7 @@ class LaravelPWAServiceProvider extends ServiceProvider
     protected function registerServiceworker()
     {
         $this->publishes([
-            __DIR__ . '/../assets/js' => public_path(),
+            __DIR__ . '/../../assets/js' => public_path(),
         ], 'pwa-serviceworker');
     }
 
