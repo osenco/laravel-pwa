@@ -4,6 +4,8 @@ namespace LaravelPWA\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use LaravelPWA\Console\Commands\DeployManifest;
+use LaravelPWA\Services\MetaService;
 
 class LaravelPWAServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,7 @@ class LaravelPWAServiceProvider extends ServiceProvider
         $this->registerServiceworker();
         $this->registerDirective();
         $this->registerCommands();
+        $this->registerRoutes();
     }
 
     /**
@@ -35,9 +38,9 @@ class LaravelPWAServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function registerRoutes()
     {
-        $this->app->register(RouteServiceProvider::class);
+        $this->loadRoutesFrom(__DIR__.'/../../routes/web.php');
     }
 
     /**
@@ -48,10 +51,12 @@ class LaravelPWAServiceProvider extends ServiceProvider
     protected function registerConfig()
     {
         $this->publishes([
-            __DIR__.'/../Config/config.php' => config_path('laravelpwa.php'),
+            __DIR__ . '/../../config/laravelpwa.php' => config_path('laravelpwa.php'),
         ], 'config');
+
         $this->mergeConfigFrom(
-            __DIR__.'/../Config/config.php', 'laravelpwa'
+            __DIR__ . '/../../config/laravelpwa.php',
+            'laravelpwa'
         );
     }
 
@@ -62,17 +67,13 @@ class LaravelPWAServiceProvider extends ServiceProvider
      */
     public function registerViews()
     {
-        $viewPath = base_path('resources/views/vendor/laravelpwa');
+        $sourcePath = __DIR__ . '/../../resources/views';
 
-        $sourcePath = __DIR__.'/../resources/views';
+        $this->loadViewsFrom($sourcePath, 'laravelpwa');
 
         $this->publishes([
-            $sourcePath => $viewPath
-        ], 'views');
-
-        $this->loadViewsFrom(array_merge(array_map(function ($path) {
-            return $path . '/vendor/laravelpwa';
-        }, \Config::get('view.paths')), [$sourcePath]), 'laravelpwa');
+            $sourcePath => resource_path('views/vendor/laravelpwa'),
+        ], 'pwa-views');
     }
 
     /**
@@ -82,13 +83,9 @@ class LaravelPWAServiceProvider extends ServiceProvider
      */
     protected function registerIcons()
     {
-        $iconsPath = public_path('images/icons');
-
-        $sourcePath = __DIR__.'/../assets/images/icons';
-
         $this->publishes([
-            $sourcePath => $iconsPath
-        ], 'icons');
+            __DIR__ . '/../assets/images/icons' => public_path('images/icons'),
+        ], 'pwa-icons');
     }
 
     /**
@@ -98,13 +95,9 @@ class LaravelPWAServiceProvider extends ServiceProvider
      */
     protected function registerServiceworker()
     {
-        $publicPath = public_path();
-
-        $sourcePath = __DIR__.'/../assets/js';
-
         $this->publishes([
-            $sourcePath => $publicPath
-        ], 'serviceworker');
+            __DIR__ . '/../assets/js' => public_path(),
+        ], 'pwa-serviceworker');
     }
 
     /**
@@ -115,11 +108,11 @@ class LaravelPWAServiceProvider extends ServiceProvider
     public function registerDirective()
     {
         Blade::directive('laravelPWA', function () {
-            return (new \LaravelPWA\Services\MetaService)->render();
+            return (new MetaService)->render();
         });
     }
 
-    
+
     /**
      * Register the available commands
      *
@@ -128,18 +121,8 @@ class LaravelPWAServiceProvider extends ServiceProvider
     public function registerCommands()
     {
         $this->commands([
-            \LaravelPWA\Console\Commands\DeployManifest::class,
+            DeployManifest::class,
         ]);
-        
-    }
 
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return [];
     }
 }

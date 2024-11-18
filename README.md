@@ -284,7 +284,7 @@ self.addEventListener("fetch", event => {
     )
 });
 ```
-To customize service worker functionality, update the `public_path/serviceworker.js`.
+To customize service worker functionality, update the `public/serviceworker.js`.
 
 The offline view
 =====

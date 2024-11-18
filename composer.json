@@ -10,13 +10,13 @@
     ],
     "authors": [
         {
-            "name": "Silvio Luis Leite",
-            "email": "silviolleite@gmail.com"
+            "name": "Osen Concepts",
+            "email": "hi@osen.co.ke"
         }
     ],
     "autoload": {
         "psr-4": {
-            "LaravelPWA\\": ""
+            "LaravelPWA\\": "src/"
         }
     },
     "minimum-stability": "stable",
