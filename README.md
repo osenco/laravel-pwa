@@ -36,7 +36,7 @@ composer require osenco/laravelpwa --prefer-dist
 ### Publish
 
 ```bash
-$ php artisan vendor:publish --provider="LaravelPWA\Providers\LaravelPWAServiceProvider"
+php artisan vendor:publish --provider="LaravelPWA\Providers\LaravelPWAServiceProvider"
 ```
 
 ### Configuration
